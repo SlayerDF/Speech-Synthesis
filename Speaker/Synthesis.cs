@@ -3,57 +3,100 @@ using NAudio.Wave;
 using System.Speech.Synthesis;
 using System.IO;
 using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Windows.Forms.VisualStyles;
 
 namespace Speaker
 {
 	public class Synthesis
 	{
-		SpeechSynthesizer ss = new SpeechSynthesizer();
+		#region Private fields
 
-		public Synthesis(int Volume, int Rate, string Voice = "") {
-			if (Volume < 0 || Volume > 100) throw new Exception("громкость должна быть в промежутке от 0 до 100");
-			if (Rate < -10 || Rate > 10) throw new Exception("скорость должна быть в промежутке от -10 до 10");
+		private readonly SpeechSynthesizer _ss = new SpeechSynthesizer();
 
-			//SpeechSynthesizer Init
-			ss.Volume = Volume;    // от 0 до 100, def 100
-			ss.Rate = Rate;        //от -10 до 10, def 0
-			if (Voice != "") ss.SelectVoice(Voice);
-			else ss.SelectVoiceByHints(VoiceGender.NotSet);
+		#endregion
 
-			string test = ss.Voice.Name;
+		#region Public properties
+
+		public string Voice {
+			get { return _ss.Voice.Name; }
+			set {
+				if (value == "") {
+					_ss.SelectVoiceByHints(VoiceGender.NotSet);
+					return;
+				}
+
+				if (!CheckVoice(value)) throw new Exception("голос не найден");
+				_ss.SelectVoice(value);
+			}
 		}
+
+		[Range(0, 100, ErrorMessage = "Громкость должна быть в промежутке от {1} до {2}.")]
+		public int Volume {
+			get { return _ss.Volume; }
+			set { _ss.Volume = value; }
+		}
+
+		[Range(-10, 10, ErrorMessage = "Скорость должна быть в промежутке от {1} до {2}.")]
+		public int Rate {
+			get { return _ss.Rate; }
+			set { _ss.Rate = value; }
+		}
+
+		#endregion
+
+		#region Constructor
+
+		public Synthesis(int volume = 100, int rate = 0, string voice = "") {
+			Volume = volume;
+			Rate = rate;
+			Voice = voice;
+		}
+
+		#endregion
+
+		#region Public methods
 
 		//Получить коллекцию установленных голосов
 		public static ReadOnlyCollection<InstalledVoice> GetInstalledVoices() {
-			var ss_temp = new SpeechSynthesizer();
-			var voices = ss_temp.GetInstalledVoices();
-			ss_temp.Dispose();
+			var ssTemp = new SpeechSynthesizer();
+			var voices = ssTemp.GetInstalledVoices();
+			ssTemp.Dispose();
 			return voices;
-		}
-
-		//Сменить голос
-		public void SetVoice(string Voice) {
-			ss.SelectVoice(Voice);
 		}
 
 		//Текст в голосовой стрим
 		public WaveStream GetVoiceStream(string text) {
 			var stream = new MemoryStream();
 
-			ss.SetOutputToWaveStream(stream);
-			ss.Speak(text);
-			ss.SetOutputToNull();
+			_ss.SetOutputToWaveStream(stream);
+			_ss.Speak(text);
+			_ss.SetOutputToNull();
 
 			return PrepareStream(stream);
 		}
 
-		//Преобразование стрима в WAV формат
-		WaveStream PrepareStream(MemoryStream InputStream) {
-			InputStream.Position = 0;
-			var OutputStream = new RawSourceWaveStream(InputStream, new WaveFormat(8000, 1));
-			OutputStream.Position = 0;
+		#endregion
 
-			return OutputStream;
+		#region Public methods
+
+		//Преобразование стрима в WAV формат
+		private static WaveStream PrepareStream(MemoryStream inputStream) {
+			inputStream.Position = 0;
+			var outputStream = new RawSourceWaveStream(inputStream, new WaveFormat(8000, 1));
+			outputStream.Position = 0;
+
+			return outputStream;
 		}
+
+		//Проверка голоса
+		private static bool CheckVoice(string voice) {
+			var voices = GetInstalledVoices();
+			var result = voices.FirstOrDefault(x => x.VoiceInfo.Name == voice);
+			return result != null;
+		}
+
+		#endregion
 	}
 }
