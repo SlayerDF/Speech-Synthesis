@@ -55,10 +55,9 @@ namespace Speaker
 
 		//Нажата кнопка "Сказать"
 		private void button_say_Click(object sender, EventArgs e) {
-			//_player.AddPhrase(_synth, textBox_text.Text);
-			_player.AddPhrase(_synth, "хэллоу");
+			_player.AddPhrase(_synth, textBox_text.Text);
 
-			if (checkBox_repeat.Checked) _player2.AddPhrase(_synth, "хэллоу");
+			if (checkBox_repeat.Checked) _player2.AddPhrase(_synth, textBox_text.Text);
 
 			textBox_text.Text = "";
 			textBox_text.Select(0, 0);
