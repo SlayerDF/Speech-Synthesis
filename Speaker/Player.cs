@@ -8,25 +8,26 @@ namespace Speaker
 {
 	public class Player
 	{
+		private const int _interval = 500;
+
 		#region Private fields
 		
 		private readonly Timer _newPhrasesTimer = new Timer();
-		private readonly Queue<WaveStream> _phrases = new Queue<WaveStream>();
+		private readonly Queue<MemoryStream> _phrases = new Queue<MemoryStream>();
 
-		private readonly WaveOut _output;
-		private WaveFileReader _reader;
-		private Stream _stream;
+		private bool _playing = false;
+		private int _device;
 
 		#endregion
 
 		#region  Public properties
 
 		public int Device {
-			get { return _output.DeviceNumber; }
+			get { return _device; }
 
 			set {
 				if (value < 0 || value > WaveOut.DeviceCount) throw new Exception("номер устройства воспроизведения должен быть в промежутке от 0 до " + WaveOut.DeviceCount);
-				_output.DeviceNumber = value;
+				_device = value;
 			}
 		}
 
@@ -34,16 +35,11 @@ namespace Speaker
 
 		#region  Constructor
 
-		public Player(int interval, int deviceNumber = 0) {
-			if (interval < 100 || interval > 5000) throw new Exception("интервал проверки фраз должен быть в промежутке от 100 до 5000");
-			if (deviceNumber < 0 || deviceNumber > WaveOut.DeviceCount) throw new Exception("номер устройства воспроизведения должен быть в промежутке от 0 до " + WaveOut.DeviceCount);
-
-			//Output Init
-			_output = new WaveOut {DeviceNumber = deviceNumber};
-			_output.PlaybackStopped += output_PlaybackStopped;
+		public Player(int deviceNumber = 0) {
+			Device = deviceNumber;
 
 			//Timer Init
-			_newPhrasesTimer.Interval = 500;
+			_newPhrasesTimer.Interval = _interval;
 			_newPhrasesTimer.Tick += new EventHandler(CheckNewPhrases);
 			_newPhrasesTimer.Start();
 		}
@@ -51,15 +47,6 @@ namespace Speaker
 		#endregion
 
 		#region Public methods
-
-		//Добавление фразы в очередь
-		public void AddPhrase(Synthesis synth, string text) {
-			_phrases.Enqueue(synth.GetVoiceStream(text));
-		}
-
-		#endregion
-
-		#region  Private methods
 
 		//Получить список устройств воспроизведения
 		public static List<string> DeviceList() {
@@ -69,27 +56,53 @@ namespace Speaker
 			return devices;
 		}
 
+		//Добавление фразы в очередь
+		public void AddPhrase(Synthesis synth, string text) {
+			synth.GetVoiceStream(text, GetPhrase);
+		}
 
-		//Проигрывание остановилось
-		private void output_PlaybackStopped(object sender, StoppedEventArgs e) {
-			_stream.Dispose();
-			_reader.Dispose();
+		#endregion
+
+		#region  Private methods
+
+		//Фраза добавлена
+		private void GetPhrase(MemoryStream stream) {
+			_phrases.Enqueue(stream);
 		}
 
 		//Проверка новых фраз
 		private void CheckNewPhrases(object sender, EventArgs e) {
-			if (_output.PlaybackState == PlaybackState.Playing) return;
+			if (_playing) return;
 			if (_phrases.Count == 0) return;
 			PlayPhrase(_phrases.Dequeue());
 		}
 
 		//Проиграть фразу
-		private void PlayPhrase(WaveStream inputStream) {
-			_stream = inputStream;
-			_reader = new NAudio.Wave.WaveFileReader(_stream);
+		private void PlayPhrase(MemoryStream stream) {
+			var waveStream = PrepareStream(stream);
+			var reader = new NAudio.Wave.WaveFileReader(waveStream);
 
-			_output.Init(_reader);
-			_output.Play();
+			var output = new WaveOut() {DeviceNumber = Device};
+			output.PlaybackStopped += (sender, args) => {
+				stream.Dispose();
+				waveStream.Dispose();
+				reader.Dispose();
+				output.Dispose();
+				_playing = false;
+			};
+
+			output.Init(reader);
+			_playing = true;
+			output.Play();
+		}
+
+		//Преобразование потока в WAV формат
+		private static WaveStream PrepareStream(MemoryStream inputStream) {
+			inputStream.Position = 0;
+			var outputStream = new RawSourceWaveStream(inputStream, new WaveFormat(8000, 1));
+			outputStream.Position = 0;
+
+			return outputStream;
 		}
 
 		#endregion

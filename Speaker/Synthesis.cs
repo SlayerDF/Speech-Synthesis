@@ -13,36 +13,30 @@ namespace Speaker
 	{
 		#region Private fields
 
-		private readonly SpeechSynthesizer _ss = new SpeechSynthesizer();
+		private string _voice;
 
 		#endregion
 
 		#region Public properties
 
 		public string Voice {
-			get { return _ss.Voice.Name; }
+			get { return _voice; }
 			set {
 				if (value == "") {
-					_ss.SelectVoiceByHints(VoiceGender.NotSet);
+					_voice = GetDefaultVoice();
 					return;
 				}
 
 				if (!CheckVoice(value)) throw new Exception("голос не найден");
-				_ss.SelectVoice(value);
+				_voice = value;
 			}
 		}
 
 		[Range(0, 100, ErrorMessage = "Громкость должна быть в промежутке от {1} до {2}.")]
-		public int Volume {
-			get { return _ss.Volume; }
-			set { _ss.Volume = value; }
-		}
+		public int Volume { get; set; }
 
 		[Range(-10, 10, ErrorMessage = "Скорость должна быть в промежутке от {1} до {2}.")]
-		public int Rate {
-			get { return _ss.Rate; }
-			set { _ss.Rate = value; }
-		}
+		public int Rate { get; set; }
 
 		#endregion
 
@@ -67,34 +61,43 @@ namespace Speaker
 		}
 
 		//Текст в голосовой стрим
-		public WaveStream GetVoiceStream(string text) {
+		public void GetVoiceStream(string text, Action<MemoryStream> callback) {
 			var stream = new MemoryStream();
 
-			_ss.SetOutputToWaveStream(stream);
-			_ss.Speak(text);
-			_ss.SetOutputToNull();
+			var ss = new SpeechSynthesizer {
+				Volume = Volume,
+				Rate = Rate
+			};
+			ss.SelectVoice(Voice);
+			ss.SpeakCompleted += (sender, args) => {
+				ss.SetOutputToNull();
+				ss.Dispose();
+				callback(stream);
+			};
 
-			return PrepareStream(stream);
+			ss.SetOutputToWaveStream(stream);
+			ss.SpeakAsync(text);
 		}
 
 		#endregion
 
 		#region Public methods
 
-		//Преобразование стрима в WAV формат
-		private static WaveStream PrepareStream(MemoryStream inputStream) {
-			inputStream.Position = 0;
-			var outputStream = new RawSourceWaveStream(inputStream, new WaveFormat(8000, 1));
-			outputStream.Position = 0;
-
-			return outputStream;
-		}
 
 		//Проверка голоса
 		private static bool CheckVoice(string voice) {
 			var voices = GetInstalledVoices();
 			var result = voices.FirstOrDefault(x => x.VoiceInfo.Name == voice);
 			return result != null;
+		}
+
+		//Получить голос по-умолчанию
+		private string GetDefaultVoice() {
+			SpeechSynthesizer ssTemp = new SpeechSynthesizer();
+			ssTemp.SelectVoiceByHints(VoiceGender.NotSet);
+			var name = ssTemp.Voice.Name;
+			ssTemp.Dispose();
+			return name;
 		}
 
 		#endregion

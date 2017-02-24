@@ -1,5 +1,12 @@
 ﻿using System;
+using System.IO;
+using System.Security.Cryptography;
 using System.Windows.Forms;
+
+using System.Speech.Synthesis;
+using NAudio;
+using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 
 namespace Speaker
 {
@@ -19,8 +26,8 @@ namespace Speaker
 			checkBox_options.Checked = false;
 
 			//Player Init
-			_player = new Player(500, 1);
-			_player2 = new Player(500, 0);
+			_player = new Player(1);
+			_player2 = new Player(0);
 
 			//Synthesis Init
 			_synth = new Synthesis(100, 0);
@@ -48,9 +55,10 @@ namespace Speaker
 
 		//Нажата кнопка "Сказать"
 		private void button_say_Click(object sender, EventArgs e) {
-			_player.AddPhrase(_synth, textBox_text.Text);
+			//_player.AddPhrase(_synth, textBox_text.Text);
+			_player.AddPhrase(_synth, "хэллоу");
 
-			if (checkBox_repeat.Checked) _player2.AddPhrase(_synth, textBox_text.Text);
+			if (checkBox_repeat.Checked) _player2.AddPhrase(_synth, "хэллоу");
 
 			textBox_text.Text = "";
 			textBox_text.Select(0, 0);
