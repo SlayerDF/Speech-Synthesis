@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Windows.Forms;
 using NAudio.Wave;
-using System.IO;
 
-namespace Speaker
+namespace SpeechSynthesis
 {
-	public class Player
+	internal class Player
 	{
-		private const int _interval = 500;
+		private const int Interval = 500;
 
 		#region Private fields
 		
@@ -39,7 +39,7 @@ namespace Speaker
 			Device = deviceNumber;
 
 			//Timer Init
-			_newPhrasesTimer.Interval = _interval;
+			_newPhrasesTimer.Interval = Interval;
 			_newPhrasesTimer.Tick += new EventHandler(CheckNewPhrases);
 			_newPhrasesTimer.Start();
 		}
@@ -74,6 +74,7 @@ namespace Speaker
 		private void CheckNewPhrases(object sender, EventArgs e) {
 			if (_playing) return;
 			if (_phrases.Count == 0) return;
+			_playing = true;
 			PlayPhrase(_phrases.Dequeue());
 		}
 
@@ -92,7 +93,6 @@ namespace Speaker
 			};
 
 			output.Init(reader);
-			_playing = true;
 			output.Play();
 		}
 

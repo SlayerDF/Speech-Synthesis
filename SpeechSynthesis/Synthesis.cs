@@ -1,15 +1,13 @@
 ﻿using System;
-using NAudio.Wave;
-using System.Speech.Synthesis;
-using System.IO;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
-using System.Windows.Forms.VisualStyles;
+using System.Speech.Synthesis;
 
-namespace Speaker
+namespace SpeechSynthesis
 {
-	public class Synthesis
+	internal class Synthesis
 	{
 		#region Private fields
 
@@ -81,7 +79,7 @@ namespace Speaker
 
 		#endregion
 
-		#region Public methods
+		#region Private methods
 
 
 		//Проверка голоса
@@ -93,7 +91,7 @@ namespace Speaker
 
 		//Получить голос по-умолчанию
 		private string GetDefaultVoice() {
-			SpeechSynthesizer ssTemp = new SpeechSynthesizer();
+			var ssTemp = new SpeechSynthesizer();
 			ssTemp.SelectVoiceByHints(VoiceGender.NotSet);
 			var name = ssTemp.Voice.Name;
 			ssTemp.Dispose();

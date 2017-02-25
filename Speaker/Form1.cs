@@ -1,43 +1,27 @@
 ﻿using System;
-using System.IO;
-using System.Security.Cryptography;
 using System.Windows.Forms;
-
-using System.Speech.Synthesis;
-using NAudio;
-using NAudio.Wave;
-using NAudio.Wave.SampleProviders;
+using SpeechSynthesis;
 
 namespace Speaker
 {
 	public partial class Form1 : Form
 	{
-		private readonly Player _player;
-		private readonly Player _player2;
-		readonly Synthesis _synth;
+		private SpeechManager _synth;
 
 		public Form1() {
 			InitializeComponent();
 
-			var devices = Player.DeviceList();
-			if (devices == null) throw new ArgumentNullException(nameof(devices));
-
 			//Form Init
 			checkBox_options.Checked = false;
 
-			//Player Init
-			_player = new Player(1);
-			_player2 = new Player(0);
-
-			//Synthesis Init
-			_synth = new Synthesis(100, 0);
+			_synth = new SpeechManager();
 
 			//Fill Combo Box
-			foreach (var voice in Synthesis.GetInstalledVoices())
+			foreach (var voice in SpeechManager.GetInstalledVoices())
 				comboBox_voices.Items.Add(voice.VoiceInfo.Name);
 			comboBox_voices.SelectedIndex = 1;
 
-			foreach (var device in Player.DeviceList())
+			foreach (var device in SpeechManager.DeviceList())
 				comboBox_outputs.Items.Add(device);
 			comboBox_outputs.SelectedIndex = 1;
 		}
@@ -50,14 +34,12 @@ namespace Speaker
 		//Выбор источника звука
 		private void comboBox_outputs_SelectedIndexChanged(object sender, EventArgs e) {
 			if (comboBox_outputs.SelectedIndex == -1) return;
-			_player.Device = comboBox_outputs.SelectedIndex;
+			_synth.Device = comboBox_outputs.SelectedIndex;
 		}
 
 		//Нажата кнопка "Сказать"
 		private void button_say_Click(object sender, EventArgs e) {
-			_player.AddPhrase(_synth, textBox_text.Text);
-
-			if (checkBox_repeat.Checked) _player2.AddPhrase(_synth, textBox_text.Text);
+			_synth.Synthesize(textBox_text.Text, checkBox_repeat.Checked);
 
 			textBox_text.Text = "";
 			textBox_text.Select(0, 0);
