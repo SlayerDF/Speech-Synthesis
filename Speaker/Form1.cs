@@ -14,21 +14,22 @@ namespace Speaker
 			//Form Init
 			checkBox_options.Checked = false;
 
+			//Synthesis Init
 			_synth = new SpeechManager();
 
 			//Fill Combo Box
-			foreach (var voice in SpeechManager.GetInstalledVoices())
-				comboBox_voices.Items.Add(voice.VoiceInfo.Name);
+			foreach (var voice in _synth.VoicesList)
+				comboBox_voices.Items.Add(voice);
 			comboBox_voices.SelectedIndex = 1;
 
-			foreach (var device in SpeechManager.DeviceList())
+			foreach (var device in _synth.DeviceList)
 				comboBox_outputs.Items.Add(device);
 			comboBox_outputs.SelectedIndex = 1;
 		}
 
 		//Выбор голоса
 		private void comboBox_voices_SelectedValueChanged(object sender, EventArgs e) {
-			_synth.Voice = comboBox_voices.SelectedItem.ToString();
+			_synth.Voice = comboBox_voices.SelectedIndex;
 		}
 
 		//Выбор источника звука
@@ -39,7 +40,8 @@ namespace Speaker
 
 		//Нажата кнопка "Сказать"
 		private void button_say_Click(object sender, EventArgs e) {
-			_synth.Synthesize(textBox_text.Text, checkBox_repeat.Checked);
+			_synth.Dub = checkBox_repeat.Checked;
+			_synth.Synthesize(textBox_text.Text);
 
 			textBox_text.Text = "";
 			textBox_text.Select(0, 0);

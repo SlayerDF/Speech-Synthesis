@@ -1,0 +1,27 @@
+﻿<mui:ModernWindow x:Class="WPFSpeaker.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mui="http://firstfloorsoftware.com/ModernUI"
+        Title="Speech Synthesis" IsTitleVisible="False"
+        LogoData="m 231.6218,102.03935 c -8.96421,-5.079718 -23.00814,-9.561823 -39.14372,-9.561823 -34.66161,0 -57.07213,21.812913 -57.07213,49.303153 0,19.12365 12.8487,35.55804 42.13178,47.21151 19.72127,8.3666 26.59383,15.23916 26.59383,27.78905 0,12.5499 -8.96421,21.51411 -27.49025,21.51411 -14.04393,0 -29.28308,-5.97614 -37.64968,-11.05586 l -7.76898,25.6974 c 11.05586,6.57375 27.49024,11.05586 44.82105,11.05586 37.35087,0 61.55424,-18.82484 61.55424,-50.49839 0,-23.90456 -14.34273,-38.84491 -41.53417,-49.90077 -20.02007,-8.6654 -27.49025,-14.34273 -27.49025,-25.6974 0,-11.05586 8.3666,-20.02007 23.90456,-20.02007 13.44632,0 24.80099,5.07972 31.37474,9.26302 z M 98.036393,38.991073 C 88.175762,33.911353 71.741376,28.532827 49.928465,28.532827 c -45.4186651,0 -74.402945,27.191438 -74.402945,63.347086 0,31.075927 23.0081398,51.693607 57.072139,65.438737 27.191437,11.35466 38.84491,23.30694 38.84491,42.7294 0,20.61768 -15.239157,34.66161 -42.430595,34.66161 -18.824841,0 -37.3508754,-5.97614 -49.601963,-13.44631 l -7.768982,28.98428 c 11.055859,7.47017 33.7651919,13.74512 55.279296,13.74512 51.394806,0 79.781475,-28.68547 79.781475,-66.93277 0,-31.37474 -17.629617,-51.39481 -54.382879,-67.53038 C 23.334641,116.9797 10.48594,107.41788 10.48594,87.995422 c 0,-14.641544 11.354666,-30.478315 38.546104,-30.478315 18.824841,0 33.167578,5.97614 40.637753,10.159438 z"
+        ContentSource="/Pages/Synthesis.xaml" ResizeMode="CanMinimize" MinWidth="5" MinHeight="5"
+        Style="{StaticResource CustomTheme}" Icon="Themes/Ss.ico" IsTabStop="False" SizeToContent="WidthAndHeight">
+
+    <mui:ModernWindow.MenuLinkGroups>
+        <mui:LinkGroup DisplayName="Speech Synthesis">
+            <mui:LinkGroup.Links>
+                <mui:Link Source="/Pages/Synthesis.xaml" />
+            </mui:LinkGroup.Links>
+        </mui:LinkGroup>
+        <mui:LinkGroup DisplayName="settings">
+            <mui:LinkGroup.Links>
+                <mui:Link Source="/Pages/SettingsPage.xaml" />
+            </mui:LinkGroup.Links>
+        </mui:LinkGroup>
+    </mui:ModernWindow.MenuLinkGroups>-
+
+    <mui:ModernWindow.TitleLinks>
+        <mui:Link DisplayName="help" Source="https://github.com/slayerdf/speech-synthesis" />
+    </mui:ModernWindow.TitleLinks>
+
+</mui:ModernWindow>

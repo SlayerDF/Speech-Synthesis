@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows.Forms;
 using NAudio.Wave;
@@ -26,8 +27,8 @@ namespace SpeechSynthesis
 			get { return _device; }
 
 			set {
-				if (value < 0 || value > WaveOut.DeviceCount) throw new Exception("номер устройства воспроизведения должен быть в промежутке от 0 до " + WaveOut.DeviceCount);
-				_device = value;
+				if (value < 0 || value > WaveOut.DeviceCount) _device = 0;
+				else _device = value;
 			}
 		}
 
@@ -49,8 +50,8 @@ namespace SpeechSynthesis
 		#region Public methods
 
 		//Получить список устройств воспроизведения
-		public static List<string> DeviceList() {
-			List<string> devices = new List<string>();
+		public static ObservableCollection<string> DeviceList() {
+			ObservableCollection<string> devices = new ObservableCollection<string>();
 			for (int i = 0, d = WaveOut.DeviceCount; i < d; i++)
 				devices.Add(WaveOut.GetCapabilities(i).ProductName);
 			return devices;

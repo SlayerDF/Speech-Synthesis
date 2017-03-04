@@ -11,22 +11,20 @@ namespace SpeechSynthesis
 	{
 		#region Private fields
 
+		private int _voiceIndex;
 		private string _voice;
 
 		#endregion
 
 		#region Public properties
 
-		public string Voice {
-			get { return _voice; }
+		public int Voice {
+			get { return _voiceIndex; }
 			set {
-				if (value == "") {
-					_voice = GetDefaultVoice();
-					return;
-				}
-
-				if (!CheckVoice(value)) throw new Exception("голос не найден");
-				_voice = value;
+				var voices = GetInstalledVoices();
+				if (value < 0 || value >= voices.Count) _voiceIndex = 0;
+				else _voiceIndex = value;
+				_voice = voices[value].VoiceInfo.Name;
 			}
 		}
 
@@ -40,7 +38,7 @@ namespace SpeechSynthesis
 
 		#region Constructor
 
-		public Synthesis(int volume = 100, int rate = 0, string voice = "") {
+		public Synthesis(int volume = 100, int rate = 0, int voice = 0) {
 			Volume = volume;
 			Rate = rate;
 			Voice = voice;
@@ -66,7 +64,7 @@ namespace SpeechSynthesis
 				Volume = Volume,
 				Rate = Rate
 			};
-			ss.SelectVoice(Voice);
+			ss.SelectVoice(_voice);
 			ss.SpeakCompleted += (sender, args) => {
 				ss.SetOutputToNull();
 				ss.Dispose();
@@ -75,27 +73,6 @@ namespace SpeechSynthesis
 
 			ss.SetOutputToWaveStream(stream);
 			ss.SpeakAsync(text);
-		}
-
-		#endregion
-
-		#region Private methods
-
-
-		//Проверка голоса
-		private static bool CheckVoice(string voice) {
-			var voices = GetInstalledVoices();
-			var result = voices.FirstOrDefault(x => x.VoiceInfo.Name == voice);
-			return result != null;
-		}
-
-		//Получить голос по-умолчанию
-		private string GetDefaultVoice() {
-			var ssTemp = new SpeechSynthesizer();
-			ssTemp.SelectVoiceByHints(VoiceGender.NotSet);
-			var name = ssTemp.Voice.Name;
-			ssTemp.Dispose();
-			return name;
 		}
 
 		#endregion

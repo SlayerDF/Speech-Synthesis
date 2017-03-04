@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Speech.Synthesis;
 
 namespace SpeechSynthesis
@@ -10,7 +11,7 @@ namespace SpeechSynthesis
 		private readonly Player _player2;
 		readonly Synthesis _synth;
 
-	    public string Voice {
+	    public int Voice {
 		    get { return _synth.Voice; } 
 		    set { _synth.Voice = value; }
 	    }
@@ -30,6 +31,16 @@ namespace SpeechSynthesis
 			set { _player.Device = value; }
 	    }
 
+		public bool Dub { get; set; }
+
+	    public IEnumerable<string> VoicesList {
+		    get { return Synthesis.GetInstalledVoices().Select(x => x.VoiceInfo.Name); }
+	    }
+
+	    public IEnumerable<string> DeviceList {
+		    get { return Player.DeviceList(); }
+	    }
+
 		public SpeechManager(int device = 0, int volume = 100, int rate = 0, string voice = "") {
 			//Player Init
 			_player = new Player(device);
@@ -40,17 +51,9 @@ namespace SpeechSynthesis
 
 		}
 
-	    public void Synthesize(string text, bool dub = false) {
+	    public void Synthesize(string text) {
 			_player.AddPhrase(_synth, text);
-			if (dub) _player2.AddPhrase(_synth, text);
+			if (Dub) _player2.AddPhrase(_synth, text);
 		}
-
-	    public static ReadOnlyCollection<InstalledVoice> GetInstalledVoices() {
-		    return Synthesis.GetInstalledVoices();
-	    }
-
-	    public static List<string> DeviceList() {
-		    return Player.DeviceList();
-	    }
     }
 }
