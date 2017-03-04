@@ -6,4 +6,5 @@ The program allows you synthesize voice using Microsoft Speech Platform. You may
 
 ## Used libraries
 [NAudio](https://www.nuget.org/packages/NAudio/)
+
 [Modern UI for WPF](https://github.com/firstfloorsoftware/mui/)
