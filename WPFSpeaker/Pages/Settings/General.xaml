@@ -16,7 +16,7 @@
                 </CheckBox>
                 
                 <TextBlock Text="Voice" Margin="0,0,0,5"/>
-                <ComboBox x:Name="ComboBoxVoices" ItemsSource="{Binding VoicesList, Mode=OneWay}" SelectedValue="{Binding Voice, Mode=TwoWay}" SelectedIndex="{Binding Voice, Mode=TwoWay, FallbackValue=0}" Margin="0,0,0,10"/>
+                <ComboBox x:Name="ComboBoxVoices" ItemsSource="{Binding VoicesList, Mode=OneWay}" SelectedIndex="{Binding Voice, Mode=TwoWay, FallbackValue=0}" Margin="0,0,0,10"/>
                 <TextBlock Text="Volume" Margin="0,0,0,5"/>
                 <Slider x:Name="SliderVolume" ToolTip="{Binding RelativeSource={RelativeSource Self}, Path=Value, Mode=OneWay}" Maximum="100" Value="{Binding Volume, Mode=TwoWay, FallbackValue=100}" SmallChange="1" LargeChange="5" IsSnapToTickEnabled="True" MouseRightButtonDown="Slider_MouseRightButtonDown" Tag="100"/>
                 <TextBlock Text="Rate" Margin="0,0,0,5"/>
