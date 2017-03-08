@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Media;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -27,33 +29,44 @@ namespace WPFSpeaker
 	{
 		private Button _topMostButton;
 
-		private Grid _window;
-
 		public MainWindow() {
 			InitializeComponent();
 
 			var VM = ViewModel.Instance;
-			VM.Device = 1;
+			VM.Device = 0;
 			VM.Voice = 1;
-			VM.Dub = true;
+			VM.Dub = false;
 
 			AppearanceManager.Current.AccentColor = Colors.OrangeRed;
 
 			//FOR LOCALIZATION
 			//FirstFloor.ModernUI.Resources.*;
+
+			var hk = new HotKey(Key.J, KeyModifier.Alt, key => {
+				this.Activate();
+			});
+
+			var hk1 = new HotKey(Key.K, KeyModifier.Alt, key => {
+
+			});
+
+			var hk2 = new HotKey(Key.Enter, KeyModifier.Alt, key => {
+
+			});
 		}
 
 		//Override style
 		public override void OnApplyTemplate() {
 			base.OnApplyTemplate();
 
-			var template = this.Template;
-
-			_window = GetTemplateChild("LayoutRoot") as Grid;
-
 			//Set topmost event
 			_topMostButton = GetTemplateChild("Button_TopMost") as Button;
-			_topMostButton.Click += (sender, args) => { Topmost = !Topmost; };
+			if (_topMostButton != null) _topMostButton.Click += (sender, args) => { Topmost = !Topmost; };
+		}
+
+		//Focus textbox
+		private void ModernWindow_Activated(object sender, EventArgs e) {
+			Keyboard.Focus(Pages.Synthesis.InputBox);
 		}
 	}
 }

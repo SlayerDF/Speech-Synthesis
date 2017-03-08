@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Media;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -21,17 +23,22 @@ namespace WPFSpeaker.Pages
 	/// </summary>
 	public partial class Synthesis : UserControl
 	{
+		public static TextBox InputBox;
+
 		private List<string> _story = new List<string>();
 		private int _index;
 
 		public Synthesis() {
 			InitializeComponent();
+
+			InputBox = SayTextBox;
 		}
 
 		private void Say_OnClick(object sender, RoutedEventArgs e) {
 			ViewModel.Instance.Synthesize(SayTextBox.Text);
 		}
 
+		//System keys
 		private void SayTextBox_KeyDown(object sender, KeyEventArgs e) {
 			if (e.Key == Key.Enter) {
 				if (SayTextBox.Text == "") return;
