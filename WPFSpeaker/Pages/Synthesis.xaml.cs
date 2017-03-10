@@ -30,7 +30,8 @@ namespace WPFSpeaker.Pages
 
 		private void Say_OnClick(object sender, RoutedEventArgs e) {
 			ViewModel.Instance.Synthesize(SayTextBox.Text);
-		}
+            SayTextBox.Text = "";
+        }
 
 		private void SayTextBox_KeyDown(object sender, KeyEventArgs e) {
 			if (e.Key == Key.Enter) {
@@ -64,5 +65,10 @@ namespace WPFSpeaker.Pages
 				SayTextBox.Text = _story[_index];
 			}
 		}
-	}
+
+        private void SayTextBox_Loaded(object sender, RoutedEventArgs e) {
+            var tb = sender as TextBox;
+            tb.MaxWidth = tb.Width;
+        }
+    }
 }
