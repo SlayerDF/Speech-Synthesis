@@ -27,7 +27,7 @@ namespace SpeechSynthesis
 			get { return _device; }
 
 			set {
-				if (value < 0 || value > WaveOut.DeviceCount) _device = 0;
+				if (value < 0 || value >= WaveOut.DeviceCount) _device = 0;
 				else _device = value;
 			}
 		}
