@@ -15,13 +15,19 @@ using System.Windows.Shapes;
 
 namespace WPFSpeaker.Pages.Settings
 {
-	/// <summary>
+	/// <summary>z
 	/// Interaction logic for Hotkeys.xaml
 	/// </summary>
 	public partial class Hotkeys : UserControl
 	{
-		public Hotkeys() {
+	    public Hotkeys() {
 			InitializeComponent();
+		    DataContext = HotkeysViewModel.Instance;
 		}
-	}
+
+        private void Slider_MouseRightButtonDown(object sender, MouseButtonEventArgs e) {
+            var slider = (Slider)sender;
+            slider.Value = Convert.ToInt32(slider.Tag);
+        }
+    }
 }

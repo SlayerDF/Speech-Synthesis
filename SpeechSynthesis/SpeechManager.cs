@@ -11,27 +11,27 @@ namespace SpeechSynthesis
 		private readonly Player _player2;
 		readonly Synthesis _synth;
 
-	    public int Voice {
+	    public virtual int Voice {
 		    get { return _synth.Voice; } 
 		    set { _synth.Voice = value; }
 	    }
 
-	    public int Volume {
+	    public virtual int Volume {
 			get { return _synth.Volume; }
 			set { _synth.Volume = value; }
 	    }
 
-	    public int Rate {
+	    public virtual int Rate {
 			get { return _synth.Rate; }
 			set { _synth.Rate = value; }
 	    }
 
-	    public int Device {
+	    public virtual int Device {
 		    get { return _player.Device; }
 			set { _player.Device = value; }
 	    }
 
-		public bool Dub { get; set; }
+		public virtual bool Dub { get; set; }
 
 	    public IEnumerable<string> VoicesList {
 		    get { return Synthesis.GetInstalledVoices().Select(x => x.VoiceInfo.Name); }

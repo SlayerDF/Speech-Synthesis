@@ -41,18 +41,6 @@ namespace WPFSpeaker
 
 			//FOR LOCALIZATION
 			//FirstFloor.ModernUI.Resources.*;
-
-			var hk = new HotKey(Key.J, KeyModifier.Alt, key => {
-				this.Activate();
-			});
-
-			var hk1 = new HotKey(Key.K, KeyModifier.Alt, key => {
-
-			});
-
-			var hk2 = new HotKey(Key.Enter, KeyModifier.Alt, key => {
-
-			});
 		}
 
 		//Override style

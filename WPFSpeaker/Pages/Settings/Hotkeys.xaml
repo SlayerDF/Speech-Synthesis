@@ -3,12 +3,161 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:mui="http://firstfloorsoftware.com/ModernUI">
+             xmlns:mui="http://firstfloorsoftware.com/ModernUI"
+             xmlns:System="clr-namespace:System;assembly=mscorlib"
+             xmlns:wpfSpeaker="clr-namespace:WPFSpeaker"
+             xmlns:settings="clr-namespace:WPFSpeaker.Pages.Settings">
+
+    <UserControl.Resources>
+        <ObjectDataProvider x:Key="KeyTypeEnum" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="wpfSpeaker:KeyType"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+
+        <DataTemplate x:Key="HotkeysTemplate">
+            <Grid HorizontalAlignment="Center" Margin="10,10,10,10">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,5,20,5" Text="Action"/>
+                <ComboBox Grid.Row="0" Grid.Column="1" Margin="0,5,0,5" MinWidth="100" Text="Action" ItemsSource="{Binding Source={StaticResource KeyTypeEnum}}" SelectedValue="{Binding Path=Type}"/>
+
+                <TextBlock x:Name="ValueHeader" Grid.Row="1" Grid.Column="0" Margin="0,5,20,5" Text="Value"/>
+
+                <!--Phrase-->
+                <TextBox x:Name="ValuePhrase" Grid.Row="1" Grid.Column="1" Margin="0,5,0,5" Text="{Binding Path=StringValue, Mode=OneWayToSource}"/>
+
+                <!--Voice-->
+                <ComboBox x:Name="ValueVoice" Grid.Row="1" Grid.Column="1" Margin="0,5,0,5" Width="130" ItemsSource="{Binding ViewModelContext.VoicesList, Mode=OneWay}" SelectedIndex="{Binding Path=IntValue, Mode=OneWayToSource, FallbackValue=0}"/>
+
+                <!--Device-->
+                <ComboBox x:Name="ValueDevice" Grid.Row="1" Grid.Column="1" Margin="0,5,0,5" Width="130" ItemsSource="{Binding ViewModelContext.DeviceList, Mode=OneWay}" SelectedIndex="{Binding Path=IntValue, Mode=OneWayToSource, FallbackValue=0}"/>
+
+                <!--Dub-->
+                <CheckBox x:Name="ValueDub" Grid.Row="1" Grid.Column="1" Margin="0,5,0,5" IsChecked="{Binding BoolValue, Mode=OneWayToSource}"/>
+
+                <!--Volume-->
+                <Slider x:Name="ValueVolume" Grid.Row="1" Grid.Column="1" Margin="0,5,0,5" ToolTip="{Binding RelativeSource={RelativeSource Self}, Path=Value, Mode=OneWay}" Maximum="100" Value="{Binding IntValue, Mode=OneWayToSource, FallbackValue=100}" SmallChange="1" LargeChange="5" IsSnapToTickEnabled="True" MouseRightButtonDown="Slider_MouseRightButtonDown" Tag="100"/>
+
+                <!--Rate-->
+                <Slider x:Name="ValueRate" Grid.Row="1" Grid.Column="1" Margin="0,5,0,5" ToolTip="{Binding RelativeSource={RelativeSource Self}, Path=Value, Mode=OneWay}"  Minimum="-10" Value="{Binding IntValue, Mode=OneWayToSource, FallbackValue=0}" SmallChange="1" IsSnapToTickEnabled="True" Tag="0" MouseRightButtonDown="Slider_MouseRightButtonDown"/>
+
+                <TextBlock x:Name="HotkeyHeader" Grid.Row="2" Grid.Column="0" Margin="0,5,20,5"  Text="Hotkey"/>
+                <TextBox x:Name="Hotkey" Grid.Row="2" Grid.Column="1" Margin="0,5,0,5" Text=""/>
+                <CheckBox Grid.Row="3" Grid.Column="0" Margin="0,5,0,5" ToolTip="Valid" IsEnabled="False" IsChecked="{Binding Path=Registered, Mode=OneWay}"/>
+            </Grid>
+
+            
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding Path=Type}" Value="None">
+                    <Setter TargetName="ValueHeader" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ValuePhrase" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ValueVoice" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ValueDevice" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ValueDub" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ValueVolume" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ValueRate" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="HotkeyHeader" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="Hotkey" Property="Visibility" Value="Collapsed"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Path=Type}" Value="Activate">
+                    <Setter TargetName="ValueHeader" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ValuePhrase" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ValueVoice" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ValueDevice" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ValueDub" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ValueVolume" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ValueRate" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="HotkeyHeader" Property="Visibility" Value="Visible"/>
+                    <Setter TargetName="Hotkey" Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Path=Type}" Value="Phrase">
+                    <Setter TargetName="ValueHeader" Property="Visibility" Value="Visible"/>
+                    <Setter TargetName="ValuePhrase" Property="Visibility" Value="Visible"/>
+                    <Setter TargetName="ValueVoice" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ValueDevice" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ValueDub" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ValueVolume" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ValueRate" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="HotkeyHeader" Property="Visibility" Value="Visible"/>
+                    <Setter TargetName="Hotkey" Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Path=Type}" Value="Voice">
+                    <Setter TargetName="ValueHeader" Property="Visibility" Value="Visible"/>
+                    <Setter TargetName="ValuePhrase" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ValueVoice" Property="Visibility" Value="Visible"/>
+                    <Setter TargetName="ValueDevice" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ValueDub" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ValueVolume" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ValueRate" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="HotkeyHeader" Property="Visibility" Value="Visible"/>
+                    <Setter TargetName="Hotkey" Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Path=Type}" Value="Device">
+                    <Setter TargetName="ValueHeader" Property="Visibility" Value="Visible"/>
+                    <Setter TargetName="ValuePhrase" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ValueVoice" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ValueDevice" Property="Visibility" Value="Visible"/>
+                    <Setter TargetName="ValueDub" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ValueVolume" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ValueRate" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="HotkeyHeader" Property="Visibility" Value="Visible"/>
+                    <Setter TargetName="Hotkey" Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Path=Type}" Value="Dub">
+                    <Setter TargetName="ValueHeader" Property="Visibility" Value="Visible"/>
+                    <Setter TargetName="ValuePhrase" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ValueVoice" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ValueDevice" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ValueDub" Property="Visibility" Value="Visible"/>
+                    <Setter TargetName="ValueVolume" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ValueRate" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="HotkeyHeader" Property="Visibility" Value="Visible"/>
+                    <Setter TargetName="Hotkey" Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Path=Type}" Value="Volume">
+                    <Setter TargetName="ValueHeader" Property="Visibility" Value="Visible"/>
+                    <Setter TargetName="ValuePhrase" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ValueVoice" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ValueDevice" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ValueDub" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ValueVolume" Property="Visibility" Value="Visible"/>
+                    <Setter TargetName="ValueRate" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="HotkeyHeader" Property="Visibility" Value="Visible"/>
+                    <Setter TargetName="Hotkey" Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Path=Type}" Value="Rate">
+                    <Setter TargetName="ValueHeader" Property="Visibility" Value="Visible"/>
+                    <Setter TargetName="ValuePhrase" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ValueVoice" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ValueDevice" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ValueDub" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ValueVolume" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="ValueRate" Property="Visibility" Value="Visible"/>
+                    <Setter TargetName="HotkeyHeader" Property="Visibility" Value="Visible"/>
+                    <Setter TargetName="Hotkey" Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+            </DataTemplate.Triggers>
+
+        </DataTemplate>
+    </UserControl.Resources>
+    
     <Grid Width="250" Height="250">
         <ScrollViewer>
             <StackPanel Margin="0,0,30,0">
-                <TextBlock Text="Hotkeys settings" Style="{StaticResource Heading2}" />
-                <TextBlock Text="Hotkeys settings wasn't realized yet." />
+                <TextBlock Text="Hotkeys settings" Margin="0,0,0,10" Style="{StaticResource Heading2}" />
+
+                <ListBox ItemsSource="{Binding Hotkeys}" ItemTemplate="{StaticResource HotkeysTemplate}"/>
+
             </StackPanel>
         </ScrollViewer>
     </Grid>
