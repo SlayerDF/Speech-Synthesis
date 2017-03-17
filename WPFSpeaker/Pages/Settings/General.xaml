@@ -6,7 +6,7 @@
              xmlns:mui="http://firstfloorsoftware.com/ModernUI"
              xmlns:local="clr-namespace:WPFSpeaker">
 
-    <Grid Width="250" Height="250">
+    <Grid Width="300" Height="250">
         <ScrollViewer>
             <StackPanel Margin="0,0,30,0">
                 <TextBlock Text="Output device" Margin="0,0,0,5"/>

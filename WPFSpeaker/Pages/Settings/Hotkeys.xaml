@@ -31,27 +31,27 @@
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,5,20,5" Text="Action"/>
-                <ComboBox Grid.Row="0" Grid.Column="1" Margin="0,5,0,5" MinWidth="100" Text="Action" ItemsSource="{Binding Source={StaticResource KeyTypeEnum}}" SelectedValue="{Binding Path=Type}"/>
+                <ComboBox Grid.Row="0" Grid.Column="1" Margin="0,5,0,5" Width="140" Text="Action" ItemsSource="{Binding Source={StaticResource KeyTypeEnum}}" SelectedValue="{Binding Path=Type}"/>
 
                 <TextBlock x:Name="ValueHeader" Grid.Row="1" Grid.Column="0" Margin="0,5,20,5" Text="Value"/>
 
                 <!--Phrase-->
-                <TextBox x:Name="ValuePhrase" Grid.Row="1" Grid.Column="1" Margin="0,5,0,5" Width="110" Text="{Binding Path=StringValue, Mode=OneWayToSource}"/>
+                <TextBox x:Name="ValuePhrase" Grid.Row="1" Grid.Column="1" Margin="0,5,0,5" Text="{Binding Path=StringValue, Mode=OneWayToSource}"/>
 
                 <!--Voice-->
-                <ComboBox x:Name="ValueVoice" Grid.Row="1" Grid.Column="1" Margin="0,5,0,5" Width="110" ItemsSource="{Binding ViewModelContext.VoicesList, Mode=OneWay}" SelectedIndex="{Binding Path=IntValue, Mode=OneWayToSource, FallbackValue=0}"/>
+                <ComboBox x:Name="ValueVoice" Grid.Row="1" Grid.Column="1" Margin="0,5,0,5" ItemsSource="{Binding ViewModelContext.VoicesList, Mode=OneWay}" SelectedIndex="{Binding Path=IntValue, Mode=OneWayToSource, FallbackValue=0}"/>
 
                 <!--Device-->
-                <ComboBox x:Name="ValueDevice" Grid.Row="1" Grid.Column="1" Margin="0,5,0,5" Width="110" ItemsSource="{Binding ViewModelContext.DeviceList, Mode=OneWay}" SelectedIndex="{Binding Path=IntValue, Mode=OneWayToSource, FallbackValue=0}"/>
+                <ComboBox x:Name="ValueDevice" Grid.Row="1" Grid.Column="1" Margin="0,5,0,5" ItemsSource="{Binding ViewModelContext.DeviceList, Mode=OneWay}" SelectedIndex="{Binding Path=IntValue, Mode=OneWayToSource, FallbackValue=0}"/>
 
                 <!--Dub-->
-                <CheckBox x:Name="ValueDub" Grid.Row="1" Grid.Column="1" Margin="0,5,0,5" Width="110" IsChecked="{Binding BoolValue, Mode=OneWayToSource, FallbackValue=False}"/>
+                <CheckBox x:Name="ValueDub" Grid.Row="1" Grid.Column="1" Margin="0,5,0,5" IsChecked="{Binding BoolValue, Mode=OneWayToSource, FallbackValue=False}"/>
 
                 <!--Volume-->
-                <Slider x:Name="ValueVolume" Grid.Row="1" Grid.Column="1" Margin="0,5,0,5" Width="110" ToolTip="{Binding RelativeSource={RelativeSource Self}, Path=Value, Mode=OneWay}" Maximum="100" Value="{Binding IntValue, Mode=OneWayToSource, FallbackValue=100}" SmallChange="1" LargeChange="5" IsSnapToTickEnabled="True" MouseRightButtonDown="Slider_MouseRightButtonDown" Tag="100"/>
+                <Slider x:Name="ValueVolume" Grid.Row="1" Grid.Column="1" Margin="0,5,0,5" ToolTip="{Binding RelativeSource={RelativeSource Self}, Path=Value, Mode=OneWay}" Maximum="100" Value="{Binding IntValue, Mode=OneWayToSource, FallbackValue=100}" SmallChange="1" LargeChange="5" IsSnapToTickEnabled="True" MouseRightButtonDown="Slider_MouseRightButtonDown" Tag="100"/>
 
                 <!--Rate-->
-                <Slider x:Name="ValueRate" Grid.Row="1" Grid.Column="1" Margin="0,5,0,5" Width="110" ToolTip="{Binding RelativeSource={RelativeSource Self}, Path=Value, Mode=OneWay}"  Minimum="-10" Value="{Binding IntValue, Mode=OneWayToSource, FallbackValue=0}" SmallChange="1" IsSnapToTickEnabled="True" Tag="0" MouseRightButtonDown="Slider_MouseRightButtonDown"/>
+                <Slider x:Name="ValueRate" Grid.Row="1" Grid.Column="1" Margin="0,5,0,5" ToolTip="{Binding RelativeSource={RelativeSource Self}, Path=Value, Mode=OneWay}"  Minimum="-10" Value="{Binding IntValue, Mode=OneWayToSource, FallbackValue=0}" SmallChange="1" IsSnapToTickEnabled="True" Tag="0" MouseRightButtonDown="Slider_MouseRightButtonDown"/>
 
                 <TextBlock x:Name="HotkeyHeader" Grid.Row="2" Grid.Column="0" Margin="0,5,20,5"  Text="Hotkey"/>
                 <TextBox x:Name="Hotkey" Grid.Row="2" Grid.Column="1" Margin="0,5,0,5" IsReadOnly="True" KeyDown="Hotkey_KeyDown">
@@ -160,11 +160,11 @@
         </DataTemplate>
     </UserControl.Resources>
     
-    <Grid Width="250" Height="250">
+    <Grid Width="300" Height="250">
         <ScrollViewer>
             <StackPanel Margin="0,0,30,0">
                 <TextBlock Text="Hotkeys settings" Margin="0,0,0,10" Style="{StaticResource Heading2}" />
-                <TextBlock Margin="0,5,0,5" Text="Use hotkeys with caution - they will block original actions" TextWrapping="Wrap" />
+                <TextBlock Margin="0,5,0,5" Text="Use hotkeys with caution - they will block original actions so it's not possible to create hotkey without modifier" TextWrapping="Wrap" />
 
                 <Button Margin="0,5,0,5" Content="Add" Command="{Binding Path=AddCommand}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
 
