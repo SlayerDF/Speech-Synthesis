@@ -4,15 +4,9 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Interop;
-using System.IO;
-using System.Media;
-using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Windows;
 using FirstFloor.ModernUI.Presentation;
 
 namespace WPFSpeaker
