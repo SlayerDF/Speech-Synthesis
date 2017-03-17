@@ -33,9 +33,9 @@ namespace WPFSpeaker
 			InitializeComponent();
 
 			var VM = ViewModel.Instance;
-			VM.Device = 0;
-			VM.Voice = 1;
-			VM.Dub = false;
+			//VM.Device = 0;
+			//VM.Voice = 1;
+			//VM.Dub = false;
 
 			AppearanceManager.Current.AccentColor = Colors.OrangeRed;
 

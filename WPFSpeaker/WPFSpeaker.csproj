@@ -63,8 +63,8 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Hotkey.cs" />
+    <Compile Include="Pages\Settings\HotkeyConverter.cs" />
     <Compile Include="Pages\Settings\HotkeysViewModel.cs" />
-    <Compile Include="Themes\Behaviours.cs" />
     <Compile Include="ViewModel.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -10,24 +11,41 @@ using System.Windows.Interop;
 using System.IO;
 using System.Media;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Windows;
+using FirstFloor.ModernUI.Presentation;
 
 namespace WPFSpeaker
 {
-	public class HotKey : IDisposable
+	public class HotKey : IDisposable, INotifyPropertyChanged
 	{
-		private static Dictionary<int, HotKey> _dictHotKeyToCalBackProc;
+		//INotifyPropertyChanged
+		public event PropertyChangedEventHandler PropertyChanged;
 
+		private void NotifyPropertyChanged([CallerMemberName] String propertyName = "") {
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+		}
+
+		// ******************************************************************
+
+		private static Dictionary<HotKey, int> _dictHotKeyToCalBackProc;
 		[DllImport("user32.dll")]
 		private static extern bool RegisterHotKey(IntPtr hWnd, int id, UInt32 fsModifiers, UInt32 vlc);
-
 		[DllImport("user32.dll")]
 		private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
 
-		public const int WmHotKey = 0x0312;
+	    private static bool _toggle;
+	    public static bool Toggle {
+		    get { return _toggle; }
+		    set {
+			    _toggle = value;
+			    if (value) foreach (var hotkey in _dictHotKeyToCalBackProc.Keys) hotkey.Register();
+				else foreach (var hotkey in _dictHotKeyToCalBackProc.Keys) hotkey.Unregister();
+			}
+	    }
 
-        public ViewModel ViewModelContext => ViewModel.Instance;
-
-        private bool _disposed = false;
+	    public const int WmHotKey = 0x0312;
+		public ViewModel ViewModelContext => ViewModel.Instance;
 
 	    private Key _key;
 	    private KeyModifier _keyModifier;
@@ -35,22 +53,35 @@ namespace WPFSpeaker
 	    private string _stringValue;
 	    private int _intValue;
 	    private bool _boolValue;
-	    private bool _registered;
+		private bool _disposed = false;
+		private Action<HotKey> _removeCallback;
 
 		public Key Key { get { return _key; } set { _key = value; Unregister(); Register(); } }
-		public KeyModifier KeyModifiers { get { return _keyModifier; } set { _keyModifier = value; Unregister(); Register(); } }
-        public KeyType Type { get { return _type; } set { _type = value; Unregister(); Action = null; } }
-        public string StringValue { get { return _stringValue; } set { _stringValue = value; SetAction(); } }
-        public int IntValue { get { return _intValue; } set { _intValue = value; SetAction(); } }
-        public bool BoolValue { get { return _boolValue; } set { _boolValue = value; SetAction(); } }
+		public KeyModifier KeyModifier { get { return _keyModifier; } set { _keyModifier = value; Unregister(); Register(); } }
+        public KeyType Type { get { return _type; } set { _type = value; Unregister(); Action = null; SetAction(); NotifyPropertyChanged(); } }
+        public string StringValue { get { return _stringValue; } set { _stringValue = value; SetAction(); NotifyPropertyChanged(); } }
+        public int IntValue { get { return _intValue; } set { _intValue = value; SetAction(); NotifyPropertyChanged(); } }
+        public bool BoolValue { get { return _boolValue; } set { _boolValue = value; SetAction(); NotifyPropertyChanged(); } }
         public Action<HotKey> Action { get; private set; }
 		public int Id { get; set; }
-        public bool Registered => _registered;
 
-	    // ******************************************************************
-	    public void SetAction() {
-            if (Key == Key.None || Type == KeyType.None) return;
+		private bool _active;
+        public bool Active { get { return _active; } set { _active = value; NotifyPropertyChanged(); } }
 
+		public ICommand DeleteCommand { get { return new RelayCommand(param => Dispose(true)); } }
+
+        // ******************************************************************
+
+	    public HotKey(Action<HotKey> removeCallback) {
+            if (_dictHotKeyToCalBackProc == null) {
+                _dictHotKeyToCalBackProc = new Dictionary<HotKey, int>();
+                ComponentDispatcher.ThreadFilterMessage += new ThreadMessageEventHandler(ComponentDispatcherThreadFilterMessage);
+            }
+		    this._removeCallback = removeCallback;
+	    }
+
+		// ******************************************************************
+        public void SetAction() {
             switch (Type) {
                 case KeyType.Activate:
                     Action = hotKey => { (((MainWindow)System.Windows.Application.Current.MainWindow)).Activate(); };
@@ -74,43 +105,39 @@ namespace WPFSpeaker
                 case KeyType.Rate:
                     Action = hotKey => { ViewModel.Instance.Rate = IntValue; };
                     break;
+				case KeyType.None:
+		            Action = null;
+		            break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(Type), Type, null);
             }
-	        if (!_registered) Register();
+	        if (!Active) Register();
 	    }
 
         // ******************************************************************
         public bool Register() {
-		    if (Key == Key.None || Type == KeyType.None || Action == null)
-		        return false;
-
+	        bool result = false;
 			int virtualKeyCode = KeyInterop.VirtualKeyFromKey(Key);
-			Id = virtualKeyCode + ((int)KeyModifiers * 0x10000);
-            
-			if (_dictHotKeyToCalBackProc == null) {
-				_dictHotKeyToCalBackProc = new Dictionary<int, HotKey>();
-				ComponentDispatcher.ThreadFilterMessage += new ThreadMessageEventHandler(ComponentDispatcherThreadFilterMessage);
-			}
+			Id = virtualKeyCode + ((int)KeyModifier * 0x10000);
 
-            //if (_dictHotKeyToCalBackProc.ContainsKey(Id)) return false;
+			if (Key != Key.None && KeyModifier != KeyModifier.None && Type != KeyType.None && Action != null && !_dictHotKeyToCalBackProc.ContainsValue(Id)) {
+				result = RegisterHotKey(IntPtr.Zero, Id, (UInt32) KeyModifier, (UInt32) virtualKeyCode);
+				if (_dictHotKeyToCalBackProc.ContainsKey(this)) _dictHotKeyToCalBackProc[this] = Id;
+				else _dictHotKeyToCalBackProc.Add(this, Id);
+	        }
 
-            bool result = RegisterHotKey(IntPtr.Zero, Id, (UInt32)KeyModifiers, (UInt32)virtualKeyCode);
-
-            if (!_dictHotKeyToCalBackProc.ContainsKey(Id)) _dictHotKeyToCalBackProc.Add(Id, this);
-
-			Debug.Print(result.ToString() + ", " + Id + ", " + virtualKeyCode);
-            _registered = result;
+	        Debug.Print(result.ToString() + ", " + Id + ", " + virtualKeyCode);
+			Active = result;
 			return result;
 		}
 
 		// ******************************************************************
 		public void Unregister() {
 		    if (_dictHotKeyToCalBackProc == null) return;
-			HotKey hotKey;
-			if (_dictHotKeyToCalBackProc.TryGetValue(Id, out hotKey)) {
+			if (_dictHotKeyToCalBackProc.ContainsKey(this)) {
 				UnregisterHotKey(IntPtr.Zero, Id);
-			    _registered = false;
+				_dictHotKeyToCalBackProc[this] = -1;
+				Active = false;
 			}
 		}
 
@@ -119,8 +146,9 @@ namespace WPFSpeaker
 			if (!handled) {
 				if (msg.message == WmHotKey) {
 					HotKey hotKey;
-
-					if (_dictHotKeyToCalBackProc.TryGetValue((int)msg.wParam, out hotKey)) {
+				    int Id = (int)msg.wParam;
+				    hotKey = _dictHotKeyToCalBackProc.FirstOrDefault(x => x.Value == Id).Key;
+                    if (hotKey != null) {
 						if (hotKey.Action != null) {
 							hotKey.Action.Invoke(hotKey);
 						}
@@ -164,6 +192,8 @@ namespace WPFSpeaker
 
 				// Note disposing has been done.
 				_disposed = true;
+				_dictHotKeyToCalBackProc.Remove(this);
+				_removeCallback(this);
 			}
 		}
 	}
@@ -174,7 +204,7 @@ namespace WPFSpeaker
 	{
 		None = 0x0000,
 		Alt = 0x0001,
-		Ctrl = 0x0002,
+		Control = 0x0002,
 		NoRepeat = 0x4000,
 		Shift = 0x0004,
 		Win = 0x0008

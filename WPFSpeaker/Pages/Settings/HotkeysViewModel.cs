@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using FirstFloor.ModernUI.Presentation;
 
 namespace WPFSpeaker
 {
@@ -16,22 +17,34 @@ namespace WPFSpeaker
 
 		//Use static property 'Instance' to access HotkeyManager instead
 	    private HotkeysViewModel() {
-            _hotkeys.Add(new HotKey() {
-                Type = KeyType.Dub,
-                Key = Key.J,
-                KeyModifiers = KeyModifier.Alt,
-                BoolValue = false
-            });
-            _hotkeys.Add(new HotKey() {
-                Type = KeyType.Dub,
-                    Key = Key.K,
-                    KeyModifiers = KeyModifier.Alt,
-                    BoolValue = true
-            });
+			_hotkeys.Add(new HotKey(RemoveHotkey) {
+				Type = KeyType.Dub,
+				Key = Key.J,
+				KeyModifier = KeyModifier.Alt,
+				BoolValue = false
+			});
+			_hotkeys.Add(new HotKey(RemoveHotkey) {
+				Type = KeyType.Dub,
+				Key = Key.K,
+				KeyModifier = KeyModifier.Alt,
+				BoolValue = true
+			});
+		}
+
+		public bool Toggle { get { return HotKey.Toggle; } set { HotKey.Toggle = value; } }
+
+        private ObservableCollection<HotKey> _hotkeys = new ObservableCollection<HotKey>();
+        public ObservableCollection<HotKey> Hotkeys { get { return _hotkeys; } }
+
+		public ICommand AddCommand { get { return new RelayCommand(param => AddKey()); } }
+
+		public void AddKey() {
+	        _hotkeys.Add(new HotKey(RemoveHotkey));
 	    }
 
-        public ObservableCollection<HotKey> _hotkeys = new ObservableCollection<HotKey>();
-        public ObservableCollection<HotKey> Hotkeys { get { return _hotkeys; } }
+		public void RemoveHotkey(HotKey hotKey) {
+			_hotkeys.Remove(hotKey);
+		}
 
 	}
 }

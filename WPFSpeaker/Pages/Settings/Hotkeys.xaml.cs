@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,5 +30,26 @@ namespace WPFSpeaker.Pages.Settings
             var slider = (Slider)sender;
             slider.Value = Convert.ToInt32(slider.Tag);
         }
-    }
+
+        //Set hotkey
+        private void Hotkey_KeyDown(object sender, KeyEventArgs e) {
+            var textBox = sender as TextBox;
+            if (textBox == null) return;
+
+	        if (e.Key == Key.Escape) {
+		        textBox.Text = "";
+		        return;
+	        }
+
+	        Key key;
+	        if (e.Key == Key.System && e.KeyboardDevice.Modifiers == ModifierKeys.Alt) key = e.SystemKey;
+	        else key = e.Key;
+
+			var keyCode = Convert.ToInt32(key);     
+            if (keyCode > 115 && keyCode < 122 || keyCode == 156) return;
+
+	        var mod = e.KeyboardDevice.Modifiers;
+            textBox.Text = $"{(mod != ModifierKeys.None ? mod.ToString() + "+" : "")}{key.ToString()}";
+        }
+	}
 }

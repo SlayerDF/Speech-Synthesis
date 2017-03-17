@@ -15,6 +15,8 @@
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
 
+        <settings:HotkeyConverter x:Key="HotkeyConverter" />
+        
         <DataTemplate x:Key="HotkeysTemplate">
             <Grid HorizontalAlignment="Center" Margin="10,10,10,10">
                 <Grid.RowDefinitions>
@@ -34,31 +36,38 @@
                 <TextBlock x:Name="ValueHeader" Grid.Row="1" Grid.Column="0" Margin="0,5,20,5" Text="Value"/>
 
                 <!--Phrase-->
-                <TextBox x:Name="ValuePhrase" Grid.Row="1" Grid.Column="1" Margin="0,5,0,5" Text="{Binding Path=StringValue, Mode=OneWayToSource}"/>
+                <TextBox x:Name="ValuePhrase" Grid.Row="1" Grid.Column="1" Margin="0,5,0,5" Width="110" Text="{Binding Path=StringValue, Mode=OneWayToSource}"/>
 
                 <!--Voice-->
-                <ComboBox x:Name="ValueVoice" Grid.Row="1" Grid.Column="1" Margin="0,5,0,5" Width="130" ItemsSource="{Binding ViewModelContext.VoicesList, Mode=OneWay}" SelectedIndex="{Binding Path=IntValue, Mode=OneWayToSource, FallbackValue=0}"/>
+                <ComboBox x:Name="ValueVoice" Grid.Row="1" Grid.Column="1" Margin="0,5,0,5" Width="110" ItemsSource="{Binding ViewModelContext.VoicesList, Mode=OneWay}" SelectedIndex="{Binding Path=IntValue, Mode=OneWayToSource, FallbackValue=0}"/>
 
                 <!--Device-->
-                <ComboBox x:Name="ValueDevice" Grid.Row="1" Grid.Column="1" Margin="0,5,0,5" Width="130" ItemsSource="{Binding ViewModelContext.DeviceList, Mode=OneWay}" SelectedIndex="{Binding Path=IntValue, Mode=OneWayToSource, FallbackValue=0}"/>
+                <ComboBox x:Name="ValueDevice" Grid.Row="1" Grid.Column="1" Margin="0,5,0,5" Width="110" ItemsSource="{Binding ViewModelContext.DeviceList, Mode=OneWay}" SelectedIndex="{Binding Path=IntValue, Mode=OneWayToSource, FallbackValue=0}"/>
 
                 <!--Dub-->
-                <CheckBox x:Name="ValueDub" Grid.Row="1" Grid.Column="1" Margin="0,5,0,5" IsChecked="{Binding BoolValue, Mode=OneWayToSource}"/>
+                <CheckBox x:Name="ValueDub" Grid.Row="1" Grid.Column="1" Margin="0,5,0,5" Width="110" IsChecked="{Binding BoolValue, Mode=OneWayToSource, FallbackValue=False}"/>
 
                 <!--Volume-->
-                <Slider x:Name="ValueVolume" Grid.Row="1" Grid.Column="1" Margin="0,5,0,5" ToolTip="{Binding RelativeSource={RelativeSource Self}, Path=Value, Mode=OneWay}" Maximum="100" Value="{Binding IntValue, Mode=OneWayToSource, FallbackValue=100}" SmallChange="1" LargeChange="5" IsSnapToTickEnabled="True" MouseRightButtonDown="Slider_MouseRightButtonDown" Tag="100"/>
+                <Slider x:Name="ValueVolume" Grid.Row="1" Grid.Column="1" Margin="0,5,0,5" Width="110" ToolTip="{Binding RelativeSource={RelativeSource Self}, Path=Value, Mode=OneWay}" Maximum="100" Value="{Binding IntValue, Mode=OneWayToSource, FallbackValue=100}" SmallChange="1" LargeChange="5" IsSnapToTickEnabled="True" MouseRightButtonDown="Slider_MouseRightButtonDown" Tag="100"/>
 
                 <!--Rate-->
-                <Slider x:Name="ValueRate" Grid.Row="1" Grid.Column="1" Margin="0,5,0,5" ToolTip="{Binding RelativeSource={RelativeSource Self}, Path=Value, Mode=OneWay}"  Minimum="-10" Value="{Binding IntValue, Mode=OneWayToSource, FallbackValue=0}" SmallChange="1" IsSnapToTickEnabled="True" Tag="0" MouseRightButtonDown="Slider_MouseRightButtonDown"/>
+                <Slider x:Name="ValueRate" Grid.Row="1" Grid.Column="1" Margin="0,5,0,5" Width="110" ToolTip="{Binding RelativeSource={RelativeSource Self}, Path=Value, Mode=OneWay}"  Minimum="-10" Value="{Binding IntValue, Mode=OneWayToSource, FallbackValue=0}" SmallChange="1" IsSnapToTickEnabled="True" Tag="0" MouseRightButtonDown="Slider_MouseRightButtonDown"/>
 
                 <TextBlock x:Name="HotkeyHeader" Grid.Row="2" Grid.Column="0" Margin="0,5,20,5"  Text="Hotkey"/>
-                <TextBox x:Name="Hotkey" Grid.Row="2" Grid.Column="1" Margin="0,5,0,5" Text=""/>
-                <CheckBox Grid.Row="3" Grid.Column="0" Margin="0,5,0,5" ToolTip="Valid" IsEnabled="False" IsChecked="{Binding Path=Registered, Mode=OneWay}"/>
+                <TextBox x:Name="Hotkey" Grid.Row="2" Grid.Column="1" Margin="0,5,0,5" IsReadOnly="True" KeyDown="Hotkey_KeyDown">
+                    <TextBox.Text>
+                        <MultiBinding Converter="{StaticResource HotkeyConverter}">
+                            <Binding Path="KeyModifier" Mode="TwoWay"/>
+                            <Binding Path="Key" Mode="TwoWay"/>
+                        </MultiBinding>
+                    </TextBox.Text>
+                </TextBox>
+                <CheckBox Grid.Row="3" Grid.Column="0" Margin="0,5,0,5" ToolTip="Valid" IsEnabled="False" IsChecked="{Binding Path=Active, Mode=OneWay}"/>
+                <Button Grid.Row="3" Grid.Column="1" Margin="0,5,0,5" Content="Delete" Command="{Binding Path=DeleteCommand}"/>
             </Grid>
 
-            
             <DataTemplate.Triggers>
-                <DataTrigger Binding="{Binding Path=Type}" Value="None">
+                <DataTrigger Binding="{Binding Path=Type, Mode=OneWay}" Value="None">
                     <Setter TargetName="ValueHeader" Property="Visibility" Value="Collapsed"/>
                     <Setter TargetName="ValuePhrase" Property="Visibility" Value="Collapsed"/>
                     <Setter TargetName="ValueVoice" Property="Visibility" Value="Collapsed"/>
@@ -69,7 +78,7 @@
                     <Setter TargetName="HotkeyHeader" Property="Visibility" Value="Collapsed"/>
                     <Setter TargetName="Hotkey" Property="Visibility" Value="Collapsed"/>
                 </DataTrigger>
-                <DataTrigger Binding="{Binding Path=Type}" Value="Activate">
+                <DataTrigger Binding="{Binding Path=Type, Mode=OneWay}" Value="Activate">
                     <Setter TargetName="ValueHeader" Property="Visibility" Value="Collapsed"/>
                     <Setter TargetName="ValuePhrase" Property="Visibility" Value="Collapsed"/>
                     <Setter TargetName="ValueVoice" Property="Visibility" Value="Collapsed"/>
@@ -80,7 +89,7 @@
                     <Setter TargetName="HotkeyHeader" Property="Visibility" Value="Visible"/>
                     <Setter TargetName="Hotkey" Property="Visibility" Value="Visible"/>
                 </DataTrigger>
-                <DataTrigger Binding="{Binding Path=Type}" Value="Phrase">
+                <DataTrigger Binding="{Binding Path=Type, Mode=OneWay}" Value="Phrase">
                     <Setter TargetName="ValueHeader" Property="Visibility" Value="Visible"/>
                     <Setter TargetName="ValuePhrase" Property="Visibility" Value="Visible"/>
                     <Setter TargetName="ValueVoice" Property="Visibility" Value="Collapsed"/>
@@ -91,7 +100,7 @@
                     <Setter TargetName="HotkeyHeader" Property="Visibility" Value="Visible"/>
                     <Setter TargetName="Hotkey" Property="Visibility" Value="Visible"/>
                 </DataTrigger>
-                <DataTrigger Binding="{Binding Path=Type}" Value="Voice">
+                <DataTrigger Binding="{Binding Path=Type, Mode=OneWay}" Value="Voice">
                     <Setter TargetName="ValueHeader" Property="Visibility" Value="Visible"/>
                     <Setter TargetName="ValuePhrase" Property="Visibility" Value="Collapsed"/>
                     <Setter TargetName="ValueVoice" Property="Visibility" Value="Visible"/>
@@ -102,7 +111,7 @@
                     <Setter TargetName="HotkeyHeader" Property="Visibility" Value="Visible"/>
                     <Setter TargetName="Hotkey" Property="Visibility" Value="Visible"/>
                 </DataTrigger>
-                <DataTrigger Binding="{Binding Path=Type}" Value="Device">
+                <DataTrigger Binding="{Binding Path=Type, Mode=OneWay}" Value="Device">
                     <Setter TargetName="ValueHeader" Property="Visibility" Value="Visible"/>
                     <Setter TargetName="ValuePhrase" Property="Visibility" Value="Collapsed"/>
                     <Setter TargetName="ValueVoice" Property="Visibility" Value="Collapsed"/>
@@ -113,7 +122,7 @@
                     <Setter TargetName="HotkeyHeader" Property="Visibility" Value="Visible"/>
                     <Setter TargetName="Hotkey" Property="Visibility" Value="Visible"/>
                 </DataTrigger>
-                <DataTrigger Binding="{Binding Path=Type}" Value="Dub">
+                <DataTrigger Binding="{Binding Path=Type, Mode=OneWay}" Value="Dub">
                     <Setter TargetName="ValueHeader" Property="Visibility" Value="Visible"/>
                     <Setter TargetName="ValuePhrase" Property="Visibility" Value="Collapsed"/>
                     <Setter TargetName="ValueVoice" Property="Visibility" Value="Collapsed"/>
@@ -124,7 +133,7 @@
                     <Setter TargetName="HotkeyHeader" Property="Visibility" Value="Visible"/>
                     <Setter TargetName="Hotkey" Property="Visibility" Value="Visible"/>
                 </DataTrigger>
-                <DataTrigger Binding="{Binding Path=Type}" Value="Volume">
+                <DataTrigger Binding="{Binding Path=Type, Mode=OneWay}" Value="Volume">
                     <Setter TargetName="ValueHeader" Property="Visibility" Value="Visible"/>
                     <Setter TargetName="ValuePhrase" Property="Visibility" Value="Collapsed"/>
                     <Setter TargetName="ValueVoice" Property="Visibility" Value="Collapsed"/>
@@ -135,7 +144,7 @@
                     <Setter TargetName="HotkeyHeader" Property="Visibility" Value="Visible"/>
                     <Setter TargetName="Hotkey" Property="Visibility" Value="Visible"/>
                 </DataTrigger>
-                <DataTrigger Binding="{Binding Path=Type}" Value="Rate">
+                <DataTrigger Binding="{Binding Path=Type, Mode=OneWay}" Value="Rate">
                     <Setter TargetName="ValueHeader" Property="Visibility" Value="Visible"/>
                     <Setter TargetName="ValuePhrase" Property="Visibility" Value="Collapsed"/>
                     <Setter TargetName="ValueVoice" Property="Visibility" Value="Collapsed"/>
@@ -155,6 +164,9 @@
         <ScrollViewer>
             <StackPanel Margin="0,0,30,0">
                 <TextBlock Text="Hotkeys settings" Margin="0,0,0,10" Style="{StaticResource Heading2}" />
+                <TextBlock Margin="0,5,0,5" Text="Use hotkeys with caution - they will block original actions" TextWrapping="Wrap" />
+
+                <Button Margin="0,5,0,5" Content="Add" Command="{Binding Path=AddCommand}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
 
                 <ListBox ItemsSource="{Binding Hotkeys}" ItemTemplate="{StaticResource HotkeysTemplate}"/>
 
