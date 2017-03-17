@@ -7,7 +7,7 @@
     <Grid>
         <StackPanel>
             <TextBox Name="SayTextBox" Style="{StaticResource PlaceHolder}" Tag="Write your text..." TextWrapping="Wrap" Height="100" Margin="0,0,0,5" PreviewKeyDown="SayTextBox_KeyDown"/>
-
+            
             <Button Click="Say_OnClick" x:Name="SayButton" Style="{StaticResource SystemButton}" IsTabStop="False" Width="Auto" HorizontalAlignment="Left" VerticalAlignment="Top" Height="Auto" >
                 <Button.Content>
                     <DockPanel Height="16" HorizontalAlignment="Left" VerticalAlignment="Top">
