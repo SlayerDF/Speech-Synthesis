@@ -11,20 +11,7 @@ namespace WPFSpeaker
 		public static HotkeysViewModel Instance => _instance ?? (_instance = new HotkeysViewModel());
 
 		//Use static property 'Instance' to access HotkeyManager instead
-	    private HotkeysViewModel() {
-			_hotkeys.Add(new HotKey(RemoveHotkey) {
-				Type = KeyType.Dub,
-				Key = Key.J,
-				KeyModifier = KeyModifier.Alt,
-				BoolValue = false
-			});
-			_hotkeys.Add(new HotKey(RemoveHotkey) {
-				Type = KeyType.Dub,
-				Key = Key.K,
-				KeyModifier = KeyModifier.Alt,
-				BoolValue = true
-			});
-		}
+	    private HotkeysViewModel() {}
 
 		public bool Toggle { get { return HotKey.Toggle; } set { HotKey.Toggle = value; } }
 
