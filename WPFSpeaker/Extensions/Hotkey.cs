@@ -8,6 +8,7 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Runtime.CompilerServices;
 using FirstFloor.ModernUI.Presentation;
+using WPFSpeaker.Extensions;
 
 namespace WPFSpeaker
 {
@@ -44,19 +45,17 @@ namespace WPFSpeaker
 	    private Key _key;
 	    private KeyModifier _keyModifier;
 	    private KeyType _type;
-	    private string _stringValue;
-	    private int _intValue;
-	    private bool _boolValue;
+		private object _value;
+		private bool _option = false;
 		private bool _disposed = false;
 		private Action<HotKey> _removeCallback;
 
 		public Key Key { get { return _key; } set { _key = value; Unregister(); Register(); } }
 		public KeyModifier KeyModifier { get { return _keyModifier; } set { _keyModifier = value; Unregister(); Register(); } }
-        public KeyType Type { get { return _type; } set { _type = value; Unregister(); Action = null; SetAction(); NotifyPropertyChanged(); } }
-        public string StringValue { get { return _stringValue; } set { _stringValue = value; SetAction(); NotifyPropertyChanged(); } }
-        public int IntValue { get { return _intValue; } set { _intValue = value; SetAction(); NotifyPropertyChanged(); } }
-        public bool BoolValue { get { return _boolValue; } set { _boolValue = value; SetAction(); NotifyPropertyChanged(); } }
-        public Action<HotKey> Action { get; private set; }
+        public KeyType Type { get { return _type; } set { _type = value; ClearValue(); Action = null; SetAction(); NotifyPropertyChanged(); } }
+		public object Value { get { return _value; } set { _value = value; SetAction(); NotifyPropertyChanged(); } }
+		public bool Option { get { return _option; } set { _option = value; NotifyPropertyChanged(); } }
+		public Action<HotKey> Action { get; private set; }
 		public int Id { get; set; }
 
 		private bool _active;
@@ -75,29 +74,70 @@ namespace WPFSpeaker
 	    }
 
 		// ******************************************************************
-        public void SetAction() {
+		private void ClearValue() {
+			switch (Type) {
+				case KeyType.None:
+					Value = 0;
+					break;
+				case KeyType.Activate:
+					Value = 0;
+					break;
+				case KeyType.Phrase:
+					Value = "";
+					break;
+				case KeyType.Voice:
+					Value = 0;
+					break;
+				case KeyType.Device:
+					Value = 0;
+					break;
+				case KeyType.Replication:
+					Value = false;
+					break;
+				case KeyType.Volume:
+					Value = 100;
+					break;
+				case KeyType.Rate:
+					Value = 0;
+					break;
+				default:
+					throw new ArgumentOutOfRangeException();
+			}
+		}
+
+		// ******************************************************************
+		private void SetAction() {
+			int increment;
             switch (Type) {
                 case KeyType.Activate:
                     Action = hotKey => { (((MainWindow)System.Windows.Application.Current.MainWindow)).Activate(); };
                     break;
                 case KeyType.Phrase:
-                    if (string.IsNullOrEmpty(StringValue)) return;
-                    Action = hotKey => { ViewModel.Instance.Synthesize(StringValue); };
+                    if (string.IsNullOrEmpty(Value.ToString())) return;
+                    Action = hotKey => { ViewModel.Instance.Synthesize(Value.ToString()); };
                     break;
                 case KeyType.Device:
-                    Action = hotKey => { ViewModel.Instance.Device = IntValue; };
+                    Action = hotKey => { ViewModel.Instance.Device = Convert.ToInt32(Value); };
                     break;
                 case KeyType.Voice:
-                    Action = hotKey => { ViewModel.Instance.Voice = IntValue; };
+                    Action = hotKey => { ViewModel.Instance.Voice = Convert.ToInt32(Value); };
                     break;
-                case KeyType.Dub:
-                    Action = hotKey => { ViewModel.Instance.Dub = BoolValue; };
+                case KeyType.Replication:
+                    Action = hotKey => { ViewModel.Instance.Dub = Option ? !ViewModel.Instance.Dub : Convert.ToBoolean(Value); };
                     break;
                 case KeyType.Volume:
-                    Action = hotKey => { ViewModel.Instance.Volume = IntValue; };
+		            increment = Convert.ToInt32(Value);
+                    Action = hotKey => {
+	                    if (Option) ViewModel.Instance.Volume += increment;
+						else ViewModel.Instance.Volume = Convert.ToInt32(Value); 
+                    };
                     break;
                 case KeyType.Rate:
-                    Action = hotKey => { ViewModel.Instance.Rate = IntValue; };
+					increment = Convert.ToInt32(Value);
+					Action = hotKey => {
+	                    if (Option) ViewModel.Instance.Rate += increment;
+						else ViewModel.Instance.Rate = Convert.ToInt32(Value); 
+                    };
                     break;
 				case KeyType.None:
 		            Action = null;
@@ -105,7 +145,6 @@ namespace WPFSpeaker
                 default:
                     throw new ArgumentOutOfRangeException(nameof(Type), Type, null);
             }
-	        if (!Active) Register();
 	    }
 
         // ******************************************************************
@@ -208,12 +247,19 @@ namespace WPFSpeaker
     public enum KeyType
     {
         None,
+		[Hotkey("Bring to the top", "Bring main window to the top")]
         Activate,
+		[Hotkey("Synthesize phrase", "Synthesize entered phrase")]
         Phrase,
+		[Hotkey("Set voice", "Change selected voice")]
         Voice,
+		[Hotkey("Set device", "Change selected output device")]
         Device,
-        Dub,
+		[Hotkey("Set replication", "Change replication option")]
+        Replication,
+		[Hotkey("Set volume", "Set synthesis volume")]
         Volume,
+		[Hotkey("Set rate", "Set synthesis rate")]
         Rate
     }
     // ******************************************************************

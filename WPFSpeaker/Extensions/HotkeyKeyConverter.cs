@@ -3,9 +3,9 @@ using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Input;
 
-namespace WPFSpeaker.Pages.Settings
+namespace WPFSpeaker.Extensions
 {
-    class HotkeyConverter : IMultiValueConverter
+    class HotkeyKeyConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture) {
             var keyModifier = values[0] as KeyModifier? ?? KeyModifier.None;

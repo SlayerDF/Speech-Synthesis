@@ -57,8 +57,12 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Hotkey.cs" />
-    <Compile Include="Pages\Settings\HotkeyConverter.cs" />
+    <Compile Include="Extensions\HotkeyAttribute.cs" />
+    <Compile Include="Extensions\HotkeyAttributeConverter.cs" />
+    <Compile Include="Extensions\Hotkey.cs" />
+    <Compile Include="Extensions\HotkeyKeyConverter.cs" />
+    <Compile Include="Extensions\HotkeyMultibindingConverter.cs" />
+    <Compile Include="Extensions\HotkeyValueConverter.cs" />
     <Compile Include="Pages\Settings\HotkeysViewModel.cs" />
     <Compile Include="ViewModel.cs" />
     <Page Include="MainWindow.xaml">

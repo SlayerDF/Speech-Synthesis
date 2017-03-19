@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.ComponentModel.DataAnnotations;
 using System.IO;
-using System.Linq;
 using System.Speech.Synthesis;
 
 namespace SpeechSynthesis
@@ -13,6 +11,9 @@ namespace SpeechSynthesis
 
 		private int _voiceIndex;
 		private string _voice;
+		private int _volume;
+		private int _rate;
+		private int _emptyLength;
 
 		#endregion
 
@@ -28,11 +29,25 @@ namespace SpeechSynthesis
 			}
 		}
 
-		[Range(0, 100, ErrorMessage = "Громкость должна быть в промежутке от {1} до {2}.")]
-		public int Volume { get; set; }
+		public int Volume {
+			get { return _volume; }
+			set {
+				if (value < 0) _volume = 0;
+				else if (value > 100) _volume = 100;
+				else _volume = value;
+			}
+		}
 
-		[Range(-10, 10, ErrorMessage = "Скорость должна быть в промежутке от {1} до {2}.")]
-		public int Rate { get; set; }
+		public int Rate
+		{
+			get { return _rate; }
+			set
+			{
+				if (value < -10) _rate = 0;
+				else if (value > 10) _rate = 100;
+				else _rate = value;
+			}
+		}
 
 		#endregion
 
@@ -42,6 +57,13 @@ namespace SpeechSynthesis
 			Volume = volume;
 			Rate = rate;
 			Voice = voice;
+
+			using (var stream = new MemoryStream())
+			using (var ss = new SpeechSynthesizer() {Volume = volume, Rate = rate}) {
+				ss.SetOutputToWaveStream(stream);
+				ss.Speak("");
+				_emptyLength = (int)stream.Length;
+			}
 		}
 
 		#endregion
@@ -68,7 +90,8 @@ namespace SpeechSynthesis
 			ss.SpeakCompleted += (sender, args) => {
 				ss.SetOutputToNull();
 				ss.Dispose();
-				callback(stream);
+				if (stream.Length != _emptyLength)
+					callback(stream);
 			};
 
 			ss.SetOutputToWaveStream(stream);
