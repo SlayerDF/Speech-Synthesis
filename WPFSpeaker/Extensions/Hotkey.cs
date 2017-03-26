@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Runtime.CompilerServices;
+using System.Windows;
 using System.Xml.Serialization;
 using FirstFloor.ModernUI.Presentation;
 using WPFSpeaker.Extensions;
@@ -118,7 +119,10 @@ namespace WPFSpeaker
 			int increment;
             switch (Type) {
                 case KeyType.Activate:
-                    Action = hotKey => { (((MainWindow)System.Windows.Application.Current.MainWindow)).Activate(); };
+                    Action = hotKey => {
+						if (Application.Current.MainWindow.WindowState == WindowState.Minimized) Application.Current.MainWindow.WindowState = WindowState.Normal;
+						(((MainWindow)System.Windows.Application.Current.MainWindow)).Activate();
+					};
                     break;
                 case KeyType.Phrase:
                     if (string.IsNullOrEmpty(Value.ToString())) return;
