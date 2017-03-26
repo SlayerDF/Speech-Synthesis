@@ -30,8 +30,10 @@ namespace WPFSpeaker.Pages
 
 		public Synthesis() {
 			InitializeComponent();
+		}
 
-			InputBox = SayTextBox;
+		private void UserControl_Loaded(object sender, RoutedEventArgs e) {
+			InputBox = SayTextBox.Template.FindName("textSource", SayTextBox) as TextBox;
 		}
 
 		private void Say_OnClick(object sender, RoutedEventArgs e) {
@@ -77,5 +79,5 @@ namespace WPFSpeaker.Pages
             var tb = sender as TextBox;
             tb.MaxWidth = tb.Width;
         }
-    }
+	}
 }

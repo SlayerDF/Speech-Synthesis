@@ -31,7 +31,7 @@ namespace SpeechSynthesis
 			set { _player.Device = value; }
 	    }
 
-		public virtual bool Dub { get; set; }
+		public virtual bool Replication { get; set; }
 
 	    public IEnumerable<string> VoicesList {
 		    get { return Synthesis.GetInstalledVoices().Select(x => x.VoiceInfo.Name); }
@@ -53,7 +53,7 @@ namespace SpeechSynthesis
 
 	    public void Synthesize(string text) {
 			_player.AddPhrase(_synth, text);
-			if (Dub) _player2.AddPhrase(_synth, text);
+			if (Replication) _player2.AddPhrase(_synth, text);
 		}
     }
 }

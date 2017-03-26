@@ -5,10 +5,15 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
+using System.Xml.Serialization;
+using FirstFloor.ModernUI.Presentation;
 using SpeechSynthesis;
+using WPFSpeaker.Extensions;
 
 namespace WPFSpeaker
 {
+	[XmlRootAttribute("Settings", IsNullable = false)]
 	public class ViewModel : SpeechManager, INotifyPropertyChanged
 	{
 		//Singleton lazy realization
@@ -27,8 +32,28 @@ namespace WPFSpeaker
             }
         }
 
-        //Override properties notifying
-        public override int Voice
+		//Settings
+
+		public ICommand SaveSettingsCommand { get { return new RelayCommand(param => SaveSettings()); } }
+		public ICommand LoadSettingsCommand { get { return new RelayCommand(param => LoadSettings()); } }
+
+		public void SaveSettings() {
+			FileManager.Instance.Serialize(typeof(ViewModel), Instance);
+		}
+
+		public void LoadSettings() {
+			var settings = FileManager.Instance.Deserialize(typeof(ViewModel)) as ViewModel;
+			if (settings == null) return;
+			Voice = settings.Voice;
+			Device = settings.Device;
+			Replication = settings.Replication;
+			Volume = settings.Volume;
+			Rate = settings.Rate;
+		}
+
+		//Override properties notifying
+
+		public override int Voice
         {
             get { return base.Voice; }
             set { base.Voice = value; NotifyPropertyChanged(); }
@@ -40,9 +65,9 @@ namespace WPFSpeaker
             set { base.Device = value; NotifyPropertyChanged(); }
         }
 
-        public override bool Dub {
-	        get { return base.Dub; }
-	        set { base.Dub = value; NotifyPropertyChanged(); }
+		public override bool Replication {
+	        get { return base.Replication; }
+	        set { base.Replication = value; NotifyPropertyChanged(); }
 	    }
 
         public override int Volume

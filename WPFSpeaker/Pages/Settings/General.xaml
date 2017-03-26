@@ -11,7 +11,7 @@
             <StackPanel Margin="0,0,30,0">
                 <TextBlock Text="Output device" Margin="0,0,0,5"/>
                 <ComboBox x:Name="ComboBoxDevices" ItemsSource="{Binding DeviceList, Mode=OneWay}" SelectedIndex="{Binding Device, Mode=TwoWay, FallbackValue=0}"  Margin="0,0,0,10" />
-                <CheckBox x:Name="CheckBoxDub" Margin="0,0,0,10" IsChecked="{Binding Dub, Mode=TwoWay, FallbackValue=True}">
+                <CheckBox x:Name="CheckBoxDub" Margin="0,0,0,10" IsChecked="{Binding Replication, Mode=TwoWay, FallbackValue=True}">
                     <TextBlock Text="Replicate speech to default output device" TextWrapping="Wrap"/>
                 </CheckBox>
                 
@@ -21,6 +21,8 @@
                 <Slider x:Name="SliderVolume" ToolTip="{Binding RelativeSource={RelativeSource Self}, Path=Value, Mode=OneWay}" Maximum="100" Value="{Binding Volume, Mode=TwoWay, FallbackValue=100}" SmallChange="1" LargeChange="5" IsSnapToTickEnabled="True" MouseRightButtonDown="Slider_MouseRightButtonDown" Tag="100"/>
                 <TextBlock Text="Rate" Margin="0,0,0,5"/>
                 <Slider x:Name="SliderRate" ToolTip="{Binding RelativeSource={RelativeSource Self}, Path=Value, Mode=OneWay}"  Minimum="-10" Value="{Binding Rate, Mode=TwoWay, FallbackValue=0}" SmallChange="1" IsSnapToTickEnabled="True" Tag="0" MouseRightButtonDown="Slider_MouseRightButtonDown"/>
+
+                <Button Margin="0,10,0,5" Content="Save" HorizontalAlignment="Left" Command="{Binding Path=SaveSettingsCommand}"/>
             </StackPanel>
         </ScrollViewer>
     </Grid>

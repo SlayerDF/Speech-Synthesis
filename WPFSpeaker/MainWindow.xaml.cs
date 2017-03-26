@@ -16,13 +16,10 @@ namespace WPFSpeaker
 
 		public MainWindow() {
 			InitializeComponent();
-
-			var VM = ViewModel.Instance;
-			//VM.Device = 0;
-			//VM.Voice = 1;
-			//VM.Dub = false;
-
 			AppearanceManager.Current.AccentColor = Colors.OrangeRed;
+
+			ViewModel.Instance.LoadSettings();
+			HotkeysViewModel.Instance.LoadSettings();
 
 			//FOR LOCALIZATION
 			//FirstFloor.ModernUI.Resources.*;
@@ -39,6 +36,7 @@ namespace WPFSpeaker
 
 		//Focus textbox
 		private void ModernWindow_Activated(object sender, EventArgs e) {
+			if (Pages.Synthesis.InputBox == null) return;
 			Keyboard.Focus(Pages.Synthesis.InputBox);
 		}
 	}

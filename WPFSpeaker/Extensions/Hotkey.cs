@@ -7,11 +7,13 @@ using System.Runtime.InteropServices;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Runtime.CompilerServices;
+using System.Xml.Serialization;
 using FirstFloor.ModernUI.Presentation;
 using WPFSpeaker.Extensions;
 
 namespace WPFSpeaker
 {
+	[XmlRoot("Hotkey", IsNullable = false)]
 	public class HotKey : IDisposable, INotifyPropertyChanged
 	{
 		//INotifyPropertyChanged
@@ -33,6 +35,7 @@ namespace WPFSpeaker
 	    public static bool Toggle {
 		    get { return _toggle; }
 		    set {
+			    if (_dictHotKeyToCalBackProc == null) return;
 			    _toggle = value;
 			    if (value) foreach (var hotkey in _dictHotKeyToCalBackProc.Keys) hotkey.Register();
 				else foreach (var hotkey in _dictHotKeyToCalBackProc.Keys) hotkey.Unregister();
@@ -55,15 +58,20 @@ namespace WPFSpeaker
         public KeyType Type { get { return _type; } set { _type = value; ClearValue(); Action = null; SetAction(); NotifyPropertyChanged(); } }
 		public object Value { get { return _value; } set { _value = value; SetAction(); NotifyPropertyChanged(); } }
 		public bool Option { get { return _option; } set { _option = value; NotifyPropertyChanged(); } }
+		[XmlIgnore()]
 		public Action<HotKey> Action { get; private set; }
+		[XmlIgnore()]
 		public int Id { get; set; }
 
 		private bool _active;
-        public bool Active { get { return _active; } set { _active = value; NotifyPropertyChanged(); } }
+		[XmlIgnore()]
+		public bool Active { get { return _active; } set { _active = value; NotifyPropertyChanged(); } }
 
 		public ICommand DeleteCommand { get { return new RelayCommand(param => Dispose(true)); } }
 
         // ******************************************************************
+
+		public HotKey() { }
 
 	    public HotKey(Action<HotKey> removeCallback) {
             if (_dictHotKeyToCalBackProc == null) {
@@ -123,7 +131,7 @@ namespace WPFSpeaker
                     Action = hotKey => { ViewModel.Instance.Voice = Convert.ToInt32(Value); };
                     break;
                 case KeyType.Replication:
-                    Action = hotKey => { ViewModel.Instance.Dub = Option ? !ViewModel.Instance.Dub : Convert.ToBoolean(Value); };
+                    Action = hotKey => { ViewModel.Instance.Replication = Option ? !ViewModel.Instance.Replication : Convert.ToBoolean(Value); };
                     break;
                 case KeyType.Volume:
 		            increment = Convert.ToInt32(Value);
@@ -146,6 +154,18 @@ namespace WPFSpeaker
                     throw new ArgumentOutOfRangeException(nameof(Type), Type, null);
             }
 	    }
+
+		public static bool ValidateValue(KeyType type, object value) {
+			int intParse;
+			bool boolParse;
+			if (type == KeyType.None || type == KeyType.Activate || type == KeyType.Phrase)
+				return true;
+			if (type == KeyType.Replication)
+				return bool.TryParse(value.ToString(), out boolParse);
+			if (type == KeyType.Voice || type == KeyType.Device || type == KeyType.Volume || type == KeyType.Rate)
+				return int.TryParse(value.ToString(), out intParse);
+			throw new ArgumentOutOfRangeException(nameof(type), type, null);
+		}
 
         // ******************************************************************
         public bool Register() {

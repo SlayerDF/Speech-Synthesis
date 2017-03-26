@@ -25,7 +25,7 @@ namespace SpeechSynthesis
 				var voices = GetInstalledVoices();
 				if (value < 0 || value >= voices.Count) _voiceIndex = 0;
 				else _voiceIndex = value;
-				_voice = voices[value].VoiceInfo.Name;
+				_voice = voices[_voiceIndex].VoiceInfo.Name;
 			}
 		}
 

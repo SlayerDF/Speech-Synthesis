@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mui="http://firstfloorsoftware.com/ModernUI"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008">
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" Loaded="UserControl_Loaded">
     <Grid>
         <StackPanel>
             <TextBox Name="SayTextBox" Style="{StaticResource PlaceHolder}" Tag="Write your text..." TextWrapping="Wrap" Height="100" Margin="0,0,0,5" PreviewKeyDown="SayTextBox_KeyDown"/>

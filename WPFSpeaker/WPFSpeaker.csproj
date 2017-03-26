@@ -31,7 +31,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Ss.ico</ApplicationIcon>
+    <ApplicationIcon>
+    </ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="FirstFloor.ModernUI, Version=1.0.9.0, Culture=neutral, PublicKeyToken=bc9b0c37bf06c6a9, processorArchitecture=MSIL">
@@ -57,11 +58,11 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Extensions\FileManager.cs" />
     <Compile Include="Extensions\HotkeyAttribute.cs" />
     <Compile Include="Extensions\HotkeyAttributeConverter.cs" />
     <Compile Include="Extensions\Hotkey.cs" />
     <Compile Include="Extensions\HotkeyKeyConverter.cs" />
-    <Compile Include="Extensions\HotkeyMultibindingConverter.cs" />
     <Compile Include="Extensions\HotkeyValueConverter.cs" />
     <Compile Include="Pages\Settings\HotkeysViewModel.cs" />
     <Compile Include="ViewModel.cs" />
@@ -126,7 +127,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Ss.ico" />
     <Resource Include="Themes\Ss.ico" />
   </ItemGroup>
   <ItemGroup>
